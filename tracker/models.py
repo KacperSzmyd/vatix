@@ -19,12 +19,12 @@ class Device(models.Model):
         return str(self.device_id)
 
 
-class Localization(models.Model):
+class Location(models.Model):
     # Optional on_delete=models.CASCADE in case when historical location data is irrelevant
     device = models.ForeignKey(
         Device,
         on_delete=models.SET_NULL,
-        related_name="localizations",
+        related_name="location",
         blank=True,
         null=True,
     )

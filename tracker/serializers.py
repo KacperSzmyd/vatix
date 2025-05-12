@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Device, Localization
+from .models import User, Device, Location
 
 
 class DeviceAssignSerializer(serializers.Serializer):
@@ -26,8 +26,7 @@ class DeviceAssignSerializer(serializers.Serializer):
         return device
 
 
-class LocalizationSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Localization
+        model = Location
         fields = ["latitude", "longitude", "ping_time"]
-
