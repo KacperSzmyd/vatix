@@ -72,3 +72,9 @@ GET /devices/
 
 👨‍💻 Author
 Kacper Szmyd – Junior Python Developer
+
+
+---
+
+“If I had more time, I would...”
+I would add tests for every crucial functionality.  
