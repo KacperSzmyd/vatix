@@ -26,7 +26,7 @@ This project is a simple backend system for tracking users and their SOS devices
 
 1. **Clone the repository** and navigate into the project folder:
    ```bash
-    git clone <your-repo-url>
+    git clone <https://github.com/KacperSzmyd/vatix>
     cd <project-folder>
 2. **Create virtual environment:**
     ```bash
