@@ -30,3 +30,4 @@ class LocalizationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Localization
         fields = ["latitude", "longitude", "ping_time"]
+

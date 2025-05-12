@@ -24,7 +24,7 @@ class Localization(models.Model):
     device = models.ForeignKey(
         Device,
         on_delete=models.SET_NULL,
-        related_name="locations",
+        related_name="localizations",
         blank=True,
         null=True,
     )
