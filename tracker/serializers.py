@@ -2,6 +2,23 @@ from rest_framework import serializers
 from .models import User, Device, Location
 
 
+class DeviceSerializer(serializers.ModelSerializer):
+    user_id = serializers.SerializerMethodField()
+    user_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Device
+        fields = ["device_id", "user_id", "user_name"]
+
+    def get_user_id(self, obj):
+        return obj.user.id if obj.user else None
+
+    def get_user_name(self, obj):
+        if obj.user:
+            return f"{obj.user.first_name} {obj.user.last_name}"
+        return None
+
+
 class DeviceAssignSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
 
