@@ -68,5 +68,7 @@ GET /map/
 🧾 Get all devices and assignment status
 GET /devices/
 
+---
+
 👨‍💻 Author
 Kacper Szmyd – Junior Python Developer
