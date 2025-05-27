@@ -24,7 +24,7 @@ class Location(models.Model):
     device = models.ForeignKey(
         Device,
         on_delete=models.SET_NULL,
-        related_name="location",
+        related_name="locations",
         blank=True,
         null=True,
     )

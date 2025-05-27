@@ -1,9 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from .serializers import DeviceAssignSerializer, LocationSerializer, DeviceSerializer
 from .models import Device, User, Location
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 
 class AssigDeviceView(APIView):
@@ -12,6 +13,12 @@ class AssigDeviceView(APIView):
             device = Device.objects.get(device_id=id)
         except Device.DoesNotExist:
             return Response({"error": "Device not found."}, status=404)
+
+        user_id = request.data.get("user_id")
+        if not user_id:
+            return Response({"error": "No user id provided"}, status=400)
+
+        user = get_object_or_404(User, id=user_id)
 
         serializer = DeviceAssignSerializer(data=request.data)
         if serializer.is_valid():
@@ -33,19 +40,25 @@ class DeviceLocationView(APIView):
         serializer = LocationSerializer(data=request.data)
 
         if serializer.is_valid():
-            new_ping_time = serializer.validated_data['ping_time']
-            last_location = device.location.order_by('-ping_time').first()
-            
-            if last_location and (new_ping_time - last_location.ping_time) < timedelta(minutes=5):
-                return Response({"error": "Location update too soon. Please wait before sending another ping"})
-            
+            new_ping_time = serializer.validated_data["ping_time"]
+            last_location = device.location.order_by("-ping_time").first()
+
+            if last_location and (new_ping_time - last_location.ping_time) < timedelta(
+                minutes=5
+            ):
+                return Response(
+                    {
+                        "error": "Location update too soon. Please wait before sending another ping"
+                    }
+                )
+
             serializer.save(device=device)
             return Response({"status": "Location recorded"}, status=201)
 
         return Response(serializer.errors, status=400)
 
 
-class UserLastLocalizationView(APIView):
+class UserLastLocationView(APIView):
     def get(self, request, id):
         try:
             user = User.objects.get(id=id)
@@ -55,7 +68,7 @@ class UserLastLocalizationView(APIView):
         device = getattr(user, "device", None)
 
         if not device:
-            return Response({"error": "User has no dedvice assigned"}, status=400)
+            return Response({"error": "User has no device assigned"}, status=400)
 
         last_location = device.location.order_by("-ping_time").first()
 
@@ -69,6 +82,27 @@ class UserLastLocalizationView(APIView):
         }
 
         return Response(data, status=200)
+
+
+class UserLoctionView(APIView):
+    def get(self, request, id):
+        try:
+            user = User.objects.get(id=id)
+        except User.DoesNotExist:
+            return Response({"error": "User does not exist"}, status=400)
+
+        date = request.query_params.get("date")
+        if not date:
+            return Response({"error": "no date provided"}, status=400)
+
+        device = getattr(user, "device", None)
+        locations = device.locations.filter(ping_time__date=date).order_by("ping_time")
+
+        if not locations:
+            return Response([], status=200)
+
+        results = LocationSerializer(locations, many=True)
+        return Response(results.data)
 
 
 class MapView(APIView):
@@ -118,3 +152,22 @@ class DeviceListView(APIView):
         devices = Device.objects.all()
         serializer = DeviceSerializer(devices, many=True)
         return Response(serializer.data)
+
+
+class DeviceLocationHistoryView(APIView):
+    def get(self, request, id):
+        device = get_object_or_404(Device, device_id=id)
+
+        days = int(request.query_params.get("days"))
+        if not days:
+            days = 1
+
+        requested_day = datetime.today() - timedelta(days=days)
+
+        locations = device.locations.filter(ping_time__date__gte=requested_day)
+
+        if not locations:
+            return Response([], status=200)
+
+        results = LocationSerializer(locations, many=True)
+        return Response(results.data, status=200)

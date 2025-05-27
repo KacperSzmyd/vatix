@@ -22,12 +22,12 @@ class DeviceSerializer(serializers.ModelSerializer):
 class DeviceAssignSerializer(serializers.Serializer):
     user_id = serializers.IntegerField()
 
-    def validate_user_id(self, value):
-        try:
-            user = User.objects.get(id=value)
-        except User.DoesNotExist:
-            raise serializers.ValidationError("User not Found.")
-        return value
+    # def validate_user_id(self, value):
+    #     try:
+    #         user = User.objects.get(id=value)
+    #     except User.DoesNotExist:
+    #         raise serializers.ValidationError("User not Found.")
+    #     return value
 
     def save(self, device):
         user_id = self.validated_data["user_id"]

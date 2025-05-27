@@ -2,10 +2,12 @@ from django.urls import path
 from .views import (
     AssigDeviceView,
     DeviceLocationView,
-    UserLastLocalizationView,
+    UserLastLocationView,
     MapView,
     UnassignDeviceView,
     DeviceListView,
+    UserLoctionView,
+    DeviceLocationHistoryView,
 )
 
 urlpatterns = [
@@ -17,7 +19,7 @@ urlpatterns = [
     ),
     path(
         "users/<int:id>/location/",
-        UserLastLocalizationView.as_view(),
+        UserLastLocationView.as_view(),
         name="user-location",
     ),
     path("map/", MapView.as_view(), name="device-map"),
@@ -27,4 +29,10 @@ urlpatterns = [
         name="unassign-device",
     ),
     path("devices/", DeviceListView.as_view(), name="device-list"),
+    path("users/<str:id>/locations/", UserLoctionView.as_view(), name="user-locations"),
+    path(
+        "devices/<str:id>/history/",
+        DeviceLocationHistoryView.as_view(),
+        name="device-history",
+    ),
 ]
