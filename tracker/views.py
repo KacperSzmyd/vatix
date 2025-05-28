@@ -2,9 +2,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from django.shortcuts import get_object_or_404
+from django.http import HttpResponse
 from .serializers import DeviceAssignSerializer, LocationSerializer, DeviceSerializer
 from .models import Device, User, Location
 from datetime import timedelta, datetime
+import csv
 
 
 class AssigDeviceView(APIView):
@@ -171,3 +173,28 @@ class DeviceLocationHistoryView(APIView):
 
         results = LocationSerializer(locations, many=True)
         return Response(results.data, status=200)
+
+
+class ExportLocationsToCsvView(APIView):
+    def get(self, request, id):
+        try:
+            device = Device.objects.get(device_id=id)
+        except Device.DoesNotExist:
+            return Response({"error": "No device with that id"}, status=400)
+
+        locations = device.locations.all().order_by("ping_time")
+
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = (
+            'attachment; filename="device_{}_locations.csv"'.format(id)
+        )
+
+        if not locations:
+            return Response([], status=200)
+        writer = csv.writer(response)
+        writer.writerow(["latitude", "longitude", "ping_time"])
+
+        for location in locations:
+            writer.writerow([location.latitude, location.longitude, location.ping_time])
+
+        return response

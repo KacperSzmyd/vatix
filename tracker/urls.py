@@ -8,6 +8,7 @@ from .views import (
     DeviceListView,
     UserLoctionView,
     DeviceLocationHistoryView,
+    ExportLocationsToCsvView,
 )
 
 urlpatterns = [
@@ -34,5 +35,10 @@ urlpatterns = [
         "devices/<str:id>/history/",
         DeviceLocationHistoryView.as_view(),
         name="device-history",
+    ),
+    path(
+        "devices/<str:id>/export/",
+        ExportLocationsToCsvView.as_view(),
+        name="export-locations",
     ),
 ]
